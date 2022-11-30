@@ -2,13 +2,26 @@ import { Request, Response } from "express"
 import { connection } from "../database/connection"
 
 
-//Functions that returns all users
+//Function that returns all users
 const selectAllUsers = async () => {
-    const result = await connection.raw(`
+    let usersNewArray = []
+    
+    const users = await connection.raw(`
         SELECT * FROM Labecommerce_users;
     `)
 
-    return result[0]
+    for (let i = 0; i < users[0].length; i++) {
+        const purchases = await connection.raw(`
+            SELECT Labecommerce_products.name, Labecommerce_products.price, Labecommerce_products.image_url,
+            Labecommerce_purchases.quantity, Labecommerce_purchases.total_price
+            FROM Labecommerce_purchases JOIN Labecommerce_products ON Labecommerce_products.id = Labecommerce_purchases.product_id
+            AND Labecommerce_purchases.user_id LIKE '${users[0][i].id}';
+        `)
+        
+        usersNewArray.push({...users[0][i], purchases: purchases[0]})
+    }
+    
+    return usersNewArray
 }
 
 //Endpoint

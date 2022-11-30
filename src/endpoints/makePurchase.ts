@@ -1,23 +1,8 @@
 import { Request, Response } from "express"
 import { connection } from "../database/connection"
+import { getProductById } from "../functions/getProductById"
+import { getUserById } from "../functions/getUserById"
 
-//Function to know whether the user exists in the database
-const selectUserId = async (user_id: string) => {
-    const result = await connection.raw(`
-        SELECT * FROM Labecommerce_users WHERE id = '${user_id}';
-    `)
-
-    return result[0]
-}
-
-//Function to know whether the product exists in the database
-const selectProductId = async (product_id: string) => {
-    const result = await connection.raw(`
-        SELECT * FROM Labecommerce_products WHERE id = '${product_id}';
-    `)
-
-    return result[0]
-}
 
 //Function to insert values into the table
 const insertPurchase = async (id: string, user_id: string, product_id: string, quantity: number, price: number) => {
@@ -28,7 +13,7 @@ const insertPurchase = async (id: string, user_id: string, product_id: string, q
 }
 
 //Endpoint
-export const purchaseRecord = async (req: Request, res: Response) => {
+export const makePurchase = async (req: Request, res: Response) => {
     const {user_id, product_id, quantity} = req.body
     let errorCode = 400
 
@@ -50,14 +35,14 @@ export const purchaseRecord = async (req: Request, res: Response) => {
             throw new Error("Provide a quantity that is higher than zero.")
         }
 
-        const userExists = await selectUserId(user_id)
+        const userExists = await getUserById(user_id)
 
         if (userExists.length === 0) {
             errorCode = 422
             throw new Error("User id does not exist.")
         }
 
-        const productExists = await selectProductId(product_id)
+        const productExists = await getProductById(product_id)
 
         if (productExists.length === 0) {
             errorCode = 422
