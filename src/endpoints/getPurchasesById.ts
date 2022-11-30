@@ -1,19 +1,11 @@
 import { Request, Response } from "express"
 import { connection } from "../database/connection"
+import { getUserById } from "../functions/getUserById"
 
 //Function that returns all purchases from a user
 const selectPurchases = async (user_id: string) => {
     const result = await connection.raw(`
         SELECT * FROM Labecommerce_purchases WHERE user_id = '${user_id}';
-    `)
-
-    return result[0]
-}
-
-//Function to check whether the user already exists in the database
-const getUserById = async(user_id: string) => {
-    const result = await connection.raw(`
-        SELECT * FROM Labecommerce_users WHERE id = '${user_id}';
     `)
 
     return result[0]

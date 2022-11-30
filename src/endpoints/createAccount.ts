@@ -1,5 +1,6 @@
 import { Request, Response } from "express"
 import { connection } from "../database/connection"
+import { getUserByEmail } from "../functions/getUserByEmail"
 
 //Function to register the user
 const postUser = async (id: string, name: string, email: string, password: string) => {
@@ -9,17 +10,8 @@ const postUser = async (id: string, name: string, email: string, password: strin
     `)
 }
 
-//Function to check whether the email already exists in the database
-const getUserByEmail = async(email: string) => {
-    const result = await connection.raw(`
-        SELECT * FROM Labecommerce_users WHERE email = '${email}';
-    `)
-
-    return result[0]
-}
-
 //Endpoint
-export const registerUser = async (req: Request, res: Response) => {
+export const createAccount = async (req: Request, res: Response) => {
     const {name, email, password} = req.body
     let errorCode = 400
 
